@@ -1,12 +1,12 @@
 
 package com.scc;
-
+import com.scc.dao.UserDao;
 import java.util.Scanner;
 
 public class Main {
 
     private static final Scanner sc = new Scanner(System.in);
-    private static final UserDao userDao = new userDao();
+    private static final UserDao UserDao = new UserDao();
 
     public static void main(String[] args) {
 
@@ -62,7 +62,7 @@ public class Main {
                 }
 
                 if (role != null) {
-                    userDao.registerUser(user, pass, role);
+                    UserDao.registerUser(user, pass, role);
                 } else {
                     System.out.println("Invalid role selection!");
                 }

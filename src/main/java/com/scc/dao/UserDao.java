@@ -5,9 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class UserDao {
-    public boolean regeisterUser(String username, String password, String role){
+    public boolean registerUser(String username, String password, String role){
 
-        String sql = "INSERT INTO user(username, password,role, status)VALUE(?, ?, ?,'PENDING')";
+        String sql = "INSERT INTO user(username, password,roles, status)VALUES(?, ?, ?,'PENDING')";
 
         try(Connection conn = DatabaseConnection.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(sql)){
