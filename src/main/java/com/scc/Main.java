@@ -7,6 +7,7 @@ import com.scc.ui.Authentication;
 import java.io.File;
 import java.util.Scanner;
 
+/** Single entry point. The database must be ready before any menu is shown. */
 public class Main {
     public static void main(String[] args) {
         if (!DatabaseInitializer.initialize()) {

@@ -98,11 +98,13 @@ public class DatabaseInitializer {
                 """
         };
 
+        // DatabaseConnection.getConnection() already turns PRAGMA foreign_keys ON.
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement()) {
             for (String sql : tables) {
                 stmt.execute(sql);
             }
+            migrateOldStatus(conn);
             seedDefaultAdmin(conn);
             return true;
         } catch (SQLException e) {
@@ -111,7 +113,16 @@ public class DatabaseInitializer {
         }
     }
 
-    /** First run only: creates an ACTIVE admin so someone can approve new accounts. */
+    /** The status used to be 'ACTIVE'. It is now 'APPROVED', so old rows are converted once. */
+    private static void migrateOldStatus(Connection conn) throws SQLException {
+        String sql = "UPDATE users SET status = 'APPROVED' WHERE status = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "ACTIVE");
+            ps.executeUpdate();
+        }
+    }
+
+    /** First run only: creates an APPROVED admin so someone can approve new accounts. */
     private static void seedDefaultAdmin(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users")) {
@@ -119,10 +130,10 @@ public class DatabaseInitializer {
                 return;
             }
         }
-        String sql = "INSERT INTO users (username, password, roles, status) VALUES (?, ?, 'ADMIN', 'ACTIVE')";
+        String sql = "INSERT INTO users (username, password, roles, status) VALUES (?, ?, 'ADMIN', 'APPROVED')";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "admin");
-            ps.setString(2, UserDao.hash("admin123"));
+            ps.setString(2, "admin123");
             ps.executeUpdate();
         }
         System.out.println("First run: default admin created (username: admin, password: admin123)");
